@@ -16,7 +16,7 @@ export default function BMICalculatorScreen() {
     const fetchUser = async () => {
       const stored = await AsyncStorage.getItem('user');
       if (stored) {
-        setUserId(stored); // Keep it consistent with lipid profile screen
+        setUserId(stored); 
       }
     };
     fetchUser();
@@ -44,7 +44,7 @@ export default function BMICalculatorScreen() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.5:5555/api/patient/bmi', {
+      const response = await fetch('http://172.20.10.7:5555/api/patient/bmi', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

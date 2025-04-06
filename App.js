@@ -11,6 +11,8 @@ import BloodSugarScreen from './src/screens/BloodSugarScreen';
 import LipidProfileScreen from './src/screens/LipidProfileScreen';
 import FBCScreen from './src/screens/FBCScreen';
 import MealTrackerScreen from './src/screens/MealTrackerScreen';
+import BMICalculatorScreen from './src/screens/BMICalculatorScreen';  
+import CalorieCounterScreen from './src/screens/CalorieCounterScreen';
 import DoctorLoginScreen from './src/screens/DoctorLoginScreen';
 import DoctorSignupScreen from './src/screens/DoctorSignupScreen';
 const Stack = createStackNavigator();
@@ -29,7 +31,8 @@ export default function AppNavigator() {
         <Stack.Screen name="LipidProfile" component={LipidProfileScreen} />
         <Stack.Screen name="FBC" component={FBCScreen} />
         <Stack.Screen name="MealTracker" component={MealTrackerScreen} />
-       
+        <Stack.Screen name="BMICalculator" component={BMICalculatorScreen} /> 
+        <Stack.Screen name="CalorieCounter" component={CalorieCounterScreen}/>
         <Stack.Screen name="DoctorSignup" component={DoctorSignupScreen}/>
         <Stack.Screen name="DoctorLogin" component={DoctorLoginScreen}/>
 
