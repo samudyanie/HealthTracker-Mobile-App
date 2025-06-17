@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
+import PatientReportList from '../components/PatientReportList';
 
 const LipidProfileScreen = () => {
   const [activeTab, setActiveTab] = useState('manual');
@@ -23,14 +24,31 @@ const LipidProfileScreen = () => {
   });
   const [pdfName, setPdfName] = useState('');
   const [fileUri, setFileUri] = useState(null); 
+  const [doctorId, setDoctorId] = useState(null);
 
   const today = new Date().toLocaleDateString('en-GB');
 
   useEffect(() => {
     const fetchUser = async () => {
-      const stored = await AsyncStorage.getItem('user');
-      if (stored) {
-        setUserId(stored);
+      try {
+        const userJsonString = await AsyncStorage.getItem('user');
+        const userJson = JSON.parse(userJsonString);
+      
+        if (userJson) {
+          const savedDoctorId = await AsyncStorage.getItem('selectedDoctorId');
+          
+          const extractedUser = userJson.patient; // 👈 this holds the object with `id`
+          const userIdValue = extractedUser?.id;
+      
+          setDoctorId(savedDoctorId);
+          setUserId(extractedUser); // 👈 optional if you still need it elsewhere
+      
+          console.log('User ID:', userIdValue); // ✅ Now this will work
+        } else {
+          Alert.alert('Error', 'User not logged in');
+        }
+      } catch (err) {
+        console.error('Failed to load user ID:', err);
       }
     };
     fetchUser();
@@ -42,17 +60,18 @@ const LipidProfileScreen = () => {
       Alert.alert('Validation', 'Please fill all fields');
       return;
     }
-
+const savedDoctorId = await AsyncStorage.getItem('selectedDoctorId');
     try {
       const response = await fetch('http://172.20.10.7:5555/api/patient/lipidprofile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId,
+          userId:userId.id,
           cholesterol,
           hdl,
           ldl,
           triglycerides,
+          docId:doctorId,
         }),
       });
 
@@ -131,7 +150,8 @@ const LipidProfileScreen = () => {
         type: 'application/pdf',
         name: pdfName,
       });
-      formData.append('userId', userId);
+      formData.append('userId', userId.id);
+      formData.append('docId',doctorId);
       
       console.log('Uploading file:', fileUri, pdfName); // Add this debug log
       
@@ -232,6 +252,10 @@ const LipidProfileScreen = () => {
     </TouchableOpacity>
           </>
         )}
+        <PatientReportList 
+          patientId={userId.id} 
+          reportType={"lipid"} 
+        />
       </View>
     </ScrollView>
   );
