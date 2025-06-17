@@ -11,6 +11,8 @@ import BloodSugarScreen from './src/screens/BloodSugarScreen';
 import LipidProfileScreen from './src/screens/LipidProfileScreen';
 import FBCScreen from './src/screens/FBCScreen';
 import MealTrackerScreen from './src/screens/MealTrackerScreen';
+import BMICalculatorScreen from './src/screens/BMICalculatorScreen';  
+import CalorieCounterScreen from './src/screens/CalorieCounterScreen';
 import DoctorLoginScreen from './src/screens/DoctorLoginScreen';
 import DoctorSignupScreen from './src/screens/DoctorSignupScreen';
 import DoctorHomeScreen from './src/screens/DoctorHomeScreen';
