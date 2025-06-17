@@ -17,7 +17,7 @@ export default function SignupScreen({ navigation }) {
         password,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         Alert.alert('Success', 'Signup Successful');
         navigation.navigate('Login'); // Navigate to Login after signup
       }

@@ -1,8 +1,48 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 
 export default function DashboardScreen({ navigation }) {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+  useEffect(() => {
+    // Function to fetch doctors from the API
+    const fetchDoctors = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://172.20.10.7:5555/api/doctor/getalldoctors');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch doctors');
+        }
+        
+        const data = await response.json();
+        setDoctors(data);
+        
+        // Check if there's a previously selected doctor
+        const savedDoctorId = await AsyncStorage.getItem('selectedDoctorId');
+        console.log("Selected doctor ID:", savedDoctorId);
+        if (savedDoctorId && Array.isArray(data)) {
+          setSelectedDoctor(savedDoctorId);
+        }
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Function to get user data if needed
+    const getUserData = async () => {
+      // Add your user data fetching logic here if needed
+    };
+
+    getUserData();
+    fetchDoctors();
+  }, []);
+
   const handleLogout = async () => {
     await AsyncStorage.removeItem('user');
     navigation.replace('Login');
@@ -31,7 +71,7 @@ export default function DashboardScreen({ navigation }) {
       <View style={styles.cardContainer}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('MealTracker')} // Navigates to Meal Tracker
+          onPress={() => navigation.navigate('MealTracker')}
         >
           <Image source={require('../assets/meal-tracker.jpg')} style={styles.cardImage} />
           <Text style={styles.cardTitle}>Meal Tracker</Text>
@@ -48,23 +88,31 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Doctors Section */}
       <Text style={styles.sectionHeader}>Our Doctors</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.doctorList}>
-        <View style={styles.doctorCard}>
-          <Image source={require('../assets/doctor1.jpg')} style={styles.doctorImage} />
-          <Text style={styles.doctorName}>Dr. Kasun Ranga</Text>
-          <Text style={styles.doctorSpecialty}>Orthopedic Surgeon</Text>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0097A7" />
+          <Text style={styles.loadingText}>Loading doctors...</Text>
         </View>
-        <View style={styles.doctorCard}>
-          <Image source={require('../assets/doctor2.jpg')} style={styles.doctorImage} />
-          <Text style={styles.doctorName}>Dr. Kalindu Senarath</Text>
-          <Text style={styles.doctorSpecialty}>Cardiologist</Text>
-        </View>
-        <View style={styles.doctorCard}>
-          <Image source={require('../assets/doctor3.jpg')} style={styles.doctorImage} />
-          <Text style={styles.doctorName}>Dr. Pasindu Senarathne</Text>
-          <Text style={styles.doctorSpecialty}>Pediatrician</Text>
-        </View>
-      </ScrollView>
+      ) : (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.doctorList}>
+          {doctors && doctors.length > 0 ? (
+            doctors.map((doctor, index) => (
+              <View key={doctor._id || index} style={styles.doctorCard}>
+                <Image 
+                  source={doctor.image ? { uri: doctor.image } : require('../assets/doctor1.jpg')} 
+                  style={styles.doctorImage} 
+                />
+                <Text style={styles.doctorName}>Dr. {doctor.name}</Text>
+                <Text style={styles.doctorSpecialty}>{doctor.specialization}</Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.noDoctorsContainer}>
+              <Text style={styles.noDoctorsText}>No doctors available</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </ScrollView>
   );
 }
@@ -84,8 +132,12 @@ const styles = StyleSheet.create({
   cardImage: { width: 100, height: 100, marginBottom: 5 },
   cardTitle: { fontSize: 16, fontWeight: 'bold' },
   doctorList: { marginTop: 10, paddingLeft: 15 },
-  doctorCard: { backgroundColor: '#fff', padding: 10, borderRadius: 8, alignItems: 'center', marginRight: 10 },
+  doctorCard: { backgroundColor: '#fff', padding: 10, borderRadius: 8, alignItems: 'center', marginRight: 10, width: 120 },
   doctorImage: { width: 100, height: 100, borderRadius: 50, marginBottom: 5 },
-  doctorName: { fontSize: 16, fontWeight: 'bold' },
-  doctorSpecialty: { fontSize: 14, color: '#555' },
+  doctorName: { fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
+  doctorSpecialty: { fontSize: 14, color: '#555', textAlign: 'center' },
+  loadingContainer: { padding: 20, alignItems: 'center' },
+  loadingText: { marginTop: 10, color: '#555' },
+  noDoctorsContainer: { padding: 20, alignItems: 'center' },
+  noDoctorsText: { color: '#555', fontStyle: 'italic' }
 });

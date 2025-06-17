@@ -14,8 +14,8 @@ export default function LoginScreen({ navigation }) {
       const response = await axios.post(API_URL, { email, password });
       console.log(response.data)
       Alert.alert('Success', 'Logged in successfully!');
-      await AsyncStorage.setItem('user', JSON.stringify(response.data.patient.id));
-      navigation.replace('Dashboard'); // Redirect to Dashboard
+      await AsyncStorage.setItem('user', JSON.stringify(response.data));
+      navigation.replace('Dashboard');
     } catch (error) {
       console.log(error);
       Alert.alert('Error', 'Invalid credentials');
