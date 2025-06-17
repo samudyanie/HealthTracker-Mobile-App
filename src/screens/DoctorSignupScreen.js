@@ -1,52 +1,117 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, ScrollView } from 'react-native';
+
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Image,
+  ScrollView,
+} from 'react-native';
 import axios from 'axios';
+import { Picker } from '@react-native-picker/picker';
 
 export default function DoctorSignupScreen({ navigation }) {
-  const [doctorId, setDoctorId] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [doctorNumber, setDoctorNumber] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [specialization, setSpecialization] = useState('');
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post('http://172.20.10.7:5555/doctor/signup', {
-        doctorId,
+      const response = await axios.post('http://172.20.10.7:5555/api/doctor/signup', {
         name,
         email,
+        doctornumber: doctorNumber,
         mobilenumber: mobileNumber,
         password,
+        specialization,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         Alert.alert('Success', 'Signup Successful');
-        navigation.navigate('Login'); // Navigate to Login after signup
+        navigation.replace('DoctorLogin');
       }
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Signup failed');
+      console.log('Signup error:', error.response?.data || error.message);
+      Alert.alert('Error', error.response?.data?.error || 'Signup failed');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Doctor Sign Up</Text>
-      <Image source={require('../assets/doctorpatient.png')} style={styles.image} />
+      <Image source={require('../assets/doctor.png')} style={styles.image} />
 
-      {/* Input fields */}
-      <TextInput style={styles.input} placeholder="Doctor ID" value={doctorId} onChangeText={setDoctorId} />
-      <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-      <TextInput style={styles.input} placeholder="Mobile Number" value={mobileNumber} onChangeText={setMobileNumber} keyboardType="phone-pad" />
-      <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Doctor Number (e.g., D12345)"
+        value={doctorNumber}
+        onChangeText={setDoctorNumber}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Mobile Number"
+        value={mobileNumber}
+        onChangeText={setMobileNumber}
+        keyboardType="phone-pad"
+      />
 
-      {/* Signup Button */}
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={specialization}
+          onValueChange={(itemValue) => setSpecialization(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Select specialization" value="" />
+          <Picker.Item label="Family Medicine Physician – General care for all ages" value="Family Medicine Physician" />
+          <Picker.Item label="General Practitioner (GP) – Basic health evaluation" value="General Practitioner" />
+          <Picker.Item label="Pediatrician – Child health (birth to teens)" value="Pediatrician" />
+          <Picker.Item label="Geriatrician – Elderly care" value="Geriatrician" />
+          <Picker.Item label="Internal Medicine Physician – Adult health" value="Internal Medicine Physician" />
+          <Picker.Item label="Cardiologist – Heart health (BP, ECG, etc.)" value="Cardiologist" />
+          <Picker.Item label="Endocrinologist – Diabetes, thyroid, hormones" value="Endocrinologist" />
+          <Picker.Item label="Gynecologist – Women’s reproductive health" value="Gynecologist" />
+          <Picker.Item label="Dermatologist – Skin, acne, moles" value="Dermatologist" />
+          <Picker.Item label="Ophthalmologist – Vision and eye care" value="Ophthalmologist" />
+          <Picker.Item label="ENT (Otolaryngologist) – Ear, nose, throat" value="ENT" />
+          <Picker.Item label="Dentist – Oral checkups and hygiene" value="Dentist" />
+          <Picker.Item label="Nutritionist/Dietitian – Diet and healthy eating" value="Nutritionist" />
+          <Picker.Item label="Psychiatrist/Psychologist – Mental health and stress" value="Psychiatrist" />
+        </Picker>
+      </View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
       <TouchableOpacity style={styles.button} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      {/* Navigate to Login screen */}
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={() => navigation.navigate('DoctorLogin')}>
         <Text style={styles.switchText}>Already have an account? Log in</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -54,44 +119,61 @@ export default function DoctorSignupScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flexGrow: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: '#B4F5FE', 
-    padding: 20
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
+    backgroundColor: '#B4F5FE',
+    padding: 20,
+    paddingTop: 60,
   },
-  title: { 
-    fontSize: 30, 
-    fontWeight: 'bold', 
-    marginBottom: 50, 
-    textAlign: 'center' 
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#1E293B',
   },
-  input: { 
-    width: '80%', 
-    padding: 15, 
-    borderWidth: 1, 
-    borderRadius: 5, 
-    marginBottom: 15, 
-    backgroundColor: '#fff' 
+  image: {
+    width: 150,
+    height: 200,
+    marginBottom: 25,
   },
-  button: { 
-    backgroundColor: '#000', 
-    padding: 15, 
-    borderRadius: 5 
+  input: {
+    width: '100%',
+    padding: 12,
+    marginVertical: 8,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#94A3B8',
+    borderWidth: 1,
   },
-  buttonText: { 
-    color: '#fff', 
-    fontSize: 18 
+  pickerWrapper: {
+    width: '100%',
+    marginVertical: 8,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#94A3B8',
+    borderWidth: 1,
   },
-  switchText: { 
-    marginTop: 10, 
-    color: 'blue' 
+  picker: {
+    height: 50,
+    width: '100%',
   },
-  image: { 
-    width: 150, 
-    height: 150, 
-    marginBottom: 20, 
-    borderRadius: 75 
+  button: {
+    backgroundColor: '#1E3A8A',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 25,
+    marginTop: 20,
+    width: '100%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  switchText: {
+    marginTop: 15,
+    color: '#1E293B',
+    fontWeight: '500',
   },
 });
