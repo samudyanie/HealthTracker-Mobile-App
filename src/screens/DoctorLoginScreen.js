@@ -1,222 +1,99 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
-import { useNavigation } from '@react-navigation/native'; // Using useNavigation for navigation in React Native
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, ScrollView } from 'react-native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [activeSlide, setActiveSlide] = useState(0);
-  const navigation = useNavigation();
+const API_URL = 'http://172.20.10.7:5555/api/doctor/login';
 
-  const slides = [
-    {
-      id: 1,
-      name: "Selina Destin",
-      role: "Web Development Agency",
-      quote:
-        "Untitled has become essential in starting every new project, we can't imagine working without it.",
-    },
-    {
-      id: 2,
-      name: "Kristin Watson",
-      role: "Medical Assistant",
-      quote:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.",
-    },
-    {
-      id: 3,
-      name: "Darrell Steward",
-      role: "Marketing Coordinator",
-      quote:
-        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    },
-  ];
-
-  const handleSlideChange = (index) => {
-    setActiveSlide(index);
-  };
+export default function DoctorLoginScreen({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:5555/api/doctor/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log("Login successful:", result);
-        // Store token and user info in AsyncStorage or state
-        navigation.navigate("DocDashboard"); // Navigate to the dashboard on successful login
-      } else {
-        console.error("Error:", result.error);
-        Alert.alert("Login Failed", result.error);
-      }
+      const response = await axios.post(API_URL, { email, password });
+      console.log(response.data.doctor)
+      Alert.alert('Success', 'Logged in successfully!');
+      await AsyncStorage.setItem('doctor', JSON.stringify(response.data.doctor));
+      navigation.navigate('DoctorHome');
     } catch (error) {
-      console.error("Error:", error);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      console.log(error);
+      Alert.alert('Error', 'Invalid credentials');
     }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Slider Section */}
-      <View style={styles.sliderContainer}>
-        <Image
-          source={{ uri: "your-image-url-here" }} 
-          style={styles.sliderImage}
-        />
-        <View style={styles.overlay}>
-          <Text style={styles.sliderText}>{slides[activeSlide]?.quote}</Text>
-          <View style={styles.slideControls}>
-            {slides.map((_, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleSlideChange(index)}
-                style={[styles.dot, activeSlide === index && styles.activeDot]}
-              />
-            ))}
-          </View>
-        </View>
-      </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Doctor Login</Text>
+      <Image source={require('../assets/doctor.png')} style={styles.image} />
 
-      {/* Login Form Section */}
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Sign in to your account</Text>
-        <Text style={styles.subtitle}>Greetings on your return! We kindly request you to enter your details.</Text>
+      {/* Input fields for email and password */}
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-        <TextInput
-          style={styles.input}
-          placeholder="example@gmail.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+      {/* Login Button */}
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
 
-        <Text style={styles.signupText}>
-          Don't have an account? 
-          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-            <Text style={styles.signupLink}> Sign up</Text>
-          </TouchableOpacity>
-        </Text>
-      </View>
-    </View>
+      {/* Signup Navigation */}
+      <TouchableOpacity onPress={() => navigation.navigate('DoctorSignup')}>
+        <Text style={styles.signupText}>Don't have an account? Sign up</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f1f1f1",
+  container: { 
+    flexGrow: 1, 
+    justifyContent: 'center',  // Centers content vertically
+    alignItems: 'center',      // Centers content horizontally
+    backgroundColor: '#B4F5FE', 
+    padding: 20 
   },
-  sliderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
+  title: { 
+    fontSize: 30,    // Increased font size
+    fontWeight: 'bold', 
+    marginBottom: 50
   },
-  sliderImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
+  input: { 
+    width: '80%', 
+    padding: 15,   // Increased padding for better spacing
+    borderWidth: 1, 
+    borderRadius: 5, 
+    marginBottom: 25, 
+    backgroundColor: '#fff' 
   },
-  overlay: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    right: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 10,
-    borderRadius: 10,
+  button: { 
+    backgroundColor: '#000', 
+    padding: 15, 
+    borderRadius: 5 
   },
-  sliderText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+  buttonText: { 
+    color: '#fff', 
+    fontSize: 18   // Increased font size for the button text
   },
-  slideControls: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
+  signupText: { 
+    marginTop: 10, 
+    color: 'blue' 
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    margin: 3,
-    backgroundColor: "#fff",
-  },
-  activeDot: {
-    backgroundColor: "#007bff",
-  },
-  formContainer: {
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    margin: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#777",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  input: {
-    height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingLeft: 10,
-    fontSize: 16,
-  },
-  loginButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginBottom: 15,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  signupText: {
-    fontSize: 14,
-    color: "#333",
-    textAlign: "center",
-  },
-  signupLink: {
-    color: "#007bff",
-    fontWeight: "bold",
+  image: { 
+    width: 150,    // Increased image width
+    height: 200,   // Increased image height
+    marginBottom: 20, // Added margin to space out image from the title
+    borderRadius: 75, // Circular image
   },
 });
-
-export default Login;
