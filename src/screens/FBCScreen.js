@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
+import PatientReportList from '../components/PatientReportList';
 
 const FBCScreen = () => {
   const [activeTab, setActiveTab] = useState('manual');
@@ -18,43 +19,58 @@ const FBCScreen = () => {
   const [form, setForm] = useState({
     rbc: '',
     wbc: '',
-    hemoglobin: '',
+    haemoglobin: '',
     platelet: '',
   });
   const [pdfName, setPdfName] = useState('');
   const [fileUri, setFileUri] = useState(null); 
+  const [doctorId, setDoctorId] = useState(null);
 
   const today = new Date().toLocaleDateString('en-GB');
 
   useEffect(() => {
     const fetchUser = async () => {
-      const stored = await AsyncStorage.getItem('user');
-      if (stored) {
-        console.log(stored);
-        const parsed = JSON.parse(stored);
-        setUserId(stored);
+      try {
+        const userJsonString = await AsyncStorage.getItem('user');
+        const userJson = JSON.parse(userJsonString);
+      
+        if (userJson) {
+          const savedDoctorId = await AsyncStorage.getItem('selectedDoctorId');
+          
+          const extractedUser = userJson.patient; // 👈 this holds the object with `id`
+          const userIdValue = extractedUser?.id;
+      
+          setDoctorId(savedDoctorId);
+          setUserId(extractedUser); // 👈 optional if you still need it elsewhere
+      
+          console.log('User ID:', userIdValue); // ✅ Now this will work
+        } else {
+          Alert.alert('Error', 'User not logged in');
+        }
+      } catch (err) {
+        console.error('Failed to load user ID:', err);
       }
     };
     fetchUser();
   }, []);
 
   const handleManualSubmit = async () => {
-    const { rbc, wbc, hemoglobin, platelet } = form;
-    if (!rbc || !wbc || !hemoglobin || !platelet) {
+    const { rbc, wbc, haemoglobin, platelet } = form;
+    if (!rbc || !wbc || !haemoglobin || !platelet) {
       Alert.alert('Validation', 'Please fill all fields');
       return;
     }
-
     try {
-      const response = await fetch('http://172.20.10.7:5555/api/patient/fbc', {
+      const response = await fetch('http://192.168.1.20:5555/api/patient/fbc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId,
+          userId: userId.id,
           rbc,
           wbc,
-          hemoglobin,
+          haemoglobin,
           platelet,
+          docId:doctorId,
         }),
       });
 
@@ -85,7 +101,7 @@ const FBCScreen = () => {
   //     });
   //     formData.append('userId', userId);
 
-  //     const uploadRes = await fetch('http://172.20.10.7:5555/api/patient/upload/fbc', {
+  //     const uploadRes = await fetch('http://192.168.1.20:5555/api/patient/upload/fbc', {
   //       method: 'POST',
   //       body: formData,
   //     });
@@ -133,11 +149,13 @@ const FBCScreen = () => {
         type: 'application/pdf',
         name: pdfName,
       });
-      formData.append('userId', userId);
+      formData.append('userId', userId.id);
+      formData.append('docId',doctorId);
+
       
       console.log('Uploading file:', fileUri, pdfName); // Add this debug log
       
-      const uploadRes = await fetch('http://172.20.10.7:5555/api/patient/upload/fbc', {
+      const uploadRes = await fetch('http://192.168.1.20:5555/api/patient/upload/fbc', {
         method: 'POST',
         body: formData,
         headers: {
@@ -205,10 +223,10 @@ const FBCScreen = () => {
             />
             <TextInput
               style={styles.input}
-              placeholder="Hemoglobin"
+              placeholder="haemoglobin"
               keyboardType="numeric"
-              value={form.hemoglobin}
-              onChangeText={val => setForm({ ...form, hemoglobin: val })}
+              value={form.haemoglobin}
+              onChangeText={val => setForm({ ...form, haemoglobin: val })}
             />
             <TextInput
               style={styles.input}
@@ -235,6 +253,10 @@ const FBCScreen = () => {
     </TouchableOpacity>
           </>
         )}
+      <PatientReportList 
+          patientId={userId.id} 
+          reportType={"fbc"} 
+        />
       </View>
     </ScrollView>
   );
