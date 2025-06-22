@@ -21,11 +21,12 @@ const BloodSugarScreen = () => {
   const [selectedTestType, setSelectedTestType] = useState('');
   const [fileUri, setFileUri] = useState(null);
   const [doctorId, setDoctorId] = useState(null); 
-
+ 
   const today = new Date().toLocaleDateString('en-GB'); // 28/03/2025 format
 
   useEffect(() => {
     const fetchUser = async () => {
+    
       try {
         const userJsonString = await AsyncStorage.getItem('user');
         const userJson = JSON.parse(userJsonString);
@@ -61,6 +62,8 @@ const BloodSugarScreen = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: userId.id,
+          docId: doctorId,
           userId: userId.id,
           docId: doctorId,
           type: selectedTestType,
@@ -163,6 +166,9 @@ const BloodSugarScreen = () => {
         formData.append('userId', userId.id);
         formData.append('docId',doctorId);
 
+        formData.append('userId', userId.id);
+        formData.append('docId',doctorId);
+
         console.log('Uploading file:', fileUri, pdfName); // Add this debug log
         
         const uploadRes = await fetch('http://192.168.1.20:5555/api/patient/upload/bloodsugar', {
@@ -260,6 +266,10 @@ const BloodSugarScreen = () => {
               </TouchableOpacity>
           </>
         )}
+          <PatientReportList 
+          patientId={userId.id} 
+          reportType={"bloodsugar"} 
+        />
           <PatientReportList 
           patientId={userId.id} 
           reportType={"bloodsugar"} 

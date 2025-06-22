@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, Scro
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://192.168.1.20:5555/api/doctor/login';
+const API_URL = 'http://172.20.10.7:5555/api/doctor/login';
 
 export default function DoctorLoginScreen({ navigation }) {
   const [email, setEmail] = useState('');

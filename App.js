@@ -32,7 +32,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
-        <Stack.Screen name="HealthTracker" component={HealthTrackerScreen} /> 
+        <Stack.Screen name="HealthTracker" component={HealthTrackerScreen} />
         <Stack.Screen name="BloodPressure" component={BloodPressureScreen} />
         <Stack.Screen name="BloodSugar" component={BloodSugarScreen} />
         <Stack.Screen name="LipidProfile" component={LipidProfileScreen} />
