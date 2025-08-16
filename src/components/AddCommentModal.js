@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -17,10 +17,19 @@ const AddCommentModal = ({
   onClose, 
   onSubmit, 
   docId, 
-  reportType 
+  reportType,
+  existingComment // new
 }) => {
   const [comment, setComment] = useState('');
   
+  useEffect(() => {
+    if (isVisible) {
+      setComment(existingComment || '');
+    }
+  }, [isVisible, existingComment]);
+
+  const isUpdate = Boolean(existingComment);
+
   const handleSubmit = () => {
     if (comment.trim()) {
       onSubmit(docId, comment, reportType);
@@ -42,7 +51,9 @@ const AddCommentModal = ({
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Add Comment</Text>
+            <Text style={styles.modalTitle}>
+              {isUpdate ? "Update Comment" : "Add Comment"}
+            </Text>
             <Text style={styles.modalSubtitle}>
               For {reportType} record ID: {docId}
             </Text>
@@ -69,11 +80,13 @@ const AddCommentModal = ({
               </TouchableOpacity>
               
               <TouchableOpacity
-                style={[styles.button, styles.submitButton]}
+                 style={[styles.button, styles.submitButton, isUpdate && { backgroundColor: '#f59e0b' }]}
                 onPress={handleSubmit}
                 disabled={!comment.trim()}
               >
-                <Text style={styles.submitButtonText}>Submit</Text>
+                <Text style={styles.submitButtonText}>
+                  {isUpdate ? "Update" : "Submit"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
