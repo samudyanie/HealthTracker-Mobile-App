@@ -32,6 +32,8 @@ const ViewReports = () => {
   const [selectedReportType, setSelectedReportType] = useState(null);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [existingComment, setExistingComment] = useState("");
+
 
   // Use React Navigation route to get parameters
   const route = useRoute();
@@ -377,10 +379,13 @@ const ViewReports = () => {
               setSelectedDocId(item.id);
               setSelectedReportType(reportType);
               setIsCommentModalOpen(true);
+              setExistingComment(item.doctorComment || ""); // new state
             }}
           >
             <MaterialIcons name="comment" size={20} color="#0d9488" />
-            <Text style={styles.actionText}>Add Comment</Text>
+            <Text style={styles.actionText}>
+              {item.doctorComment ? "Update Comment" : "Add Comment"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -429,13 +434,15 @@ const ViewReports = () => {
         title={modalTitle}
       />
       
-      <AddCommentModal
-        isVisible={isCommentModalOpen}
-        onClose={() => setIsCommentModalOpen(false)}
-        onSubmit={handleCommentSubmit}
-        docId={selectedDocId}
-        reportType={selectedReportType}
-      />
+   <AddCommentModal
+    isVisible={isCommentModalOpen}
+    onClose={() => setIsCommentModalOpen(false)}
+    onSubmit={handleCommentSubmit}
+    docId={selectedDocId}
+    reportType={selectedReportType}
+    existingComment={existingComment} // new prop
+  />
+
     </SafeAreaView>
   );
 };
