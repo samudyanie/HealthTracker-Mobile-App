@@ -37,13 +37,13 @@ const FBCScreen = () => {
         if (userJson) {
           const savedDoctorId = await AsyncStorage.getItem('selectedDoctorId');
           
-          const extractedUser = userJson.patient; // 👈 this holds the object with `id`
+          const extractedUser = userJson.patient; 
           const userIdValue = extractedUser?.id;
       
           setDoctorId(savedDoctorId);
-          setUserId(extractedUser); // 👈 optional if you still need it elsewhere
+          setUserId(extractedUser); 
       
-          console.log('User ID:', userIdValue); // ✅ Now this will work
+          console.log('User ID:', userIdValue);
         } else {
           Alert.alert('Error', 'User not logged in');
         }
@@ -83,37 +83,6 @@ const FBCScreen = () => {
     }
   };
 
-  // const handlePdfUpload = async () => {
-  //   try {
-  //     const res = await DocumentPicker.getDocumentAsync({
-  //       type: 'application/pdf',
-  //     });
-
-  //     if (res.type === 'cancel') return;
-
-  //     setPdfName(res.name);
-
-  //     const formData = new FormData();
-  //     formData.append('file', {
-  //       uri: res.uri,
-  //       name: res.name,
-  //       type: 'application/pdf',
-  //     });
-  //     formData.append('userId', userId);
-
-  //     const uploadRes = await fetch('http://192.168.1.20:5555/api/patient/upload/fbc', {
-  //       method: 'POST',
-  //       body: formData,
-  //     });
-
-  //     const result = await uploadRes.json();
-  //     console.log('Upload success:', result);
-  //     Alert.alert('Success', 'PDF uploaded successfully!');
-  //   } catch (err) {
-  //     console.error('Upload error:', err);
-  //     Alert.alert('Error', 'Failed to upload PDF');
-  //   }
-  // };
 
   const handleFileSelection = async () => {
     try {
