@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     marginBottom: 15 
   },
   optionsContainer: { 
-    flexDirection: 'column',  // Stack the login options vertically
+    flexDirection: 'column',  
     gap: 20, 
     alignItems: 'center' 
   },
@@ -62,14 +62,14 @@ const styles = StyleSheet.create({
     width: 250, 
     height: 250, 
     justifyContent: 'center', 
-    overflow: 'hidden'  // Ensures content does not spill outside the circular boundary
+    overflow: 'hidden'  
   },
   image: { 
     width: 150,    // Size of the circular image
     height: 150,   // Size of the circular image
-    borderRadius: 75,  // Makes it circular
+    borderRadius: 75,  
     marginBottom: 10,
-    resizeMode: 'cover',  // Ensures the image covers the entire circular space without stretching
+    resizeMode: 'cover', 
   },
   roleText: { 
     color: '#fff', 
