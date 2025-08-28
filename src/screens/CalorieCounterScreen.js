@@ -321,14 +321,14 @@ export default function CalorieCalculator() {
                       enabled={!!selectedCategory}
                     >
                       <Picker.Item label="Select a meal" value="" />
-                      {selectedCategory && mealData[selectedCategory]?.map((item) => (
-                        <Picker.Item 
-                          key={item.name} 
-                          label={`${formatMealName(item.name)} (${item.calories} cal, ${item.sugar}g sugar, ${item.cholesterol}mg chol)`} 
-                          value={item.name} 
-                        />
-                      ))}
-                    </Picker>
+  {selectedCategory && mealData[selectedCategory]?.map((item) => (
+    <Picker.Item 
+      key={item.name} 
+      label={formatMealName(item.name)}   // ← only show the name
+      value={item.name} 
+    />
+  ))}
+</Picker>
                   </View>
                 </View>
 
@@ -428,69 +428,82 @@ export default function CalorieCalculator() {
               </View>
             </View>
 
-            {/* Daily Value Progress */}
-            <View style={styles.progressSection}>
-              <Text style={styles.progressTitle}>Daily Value Progress</Text>
-              
-              {/* Calories Progress */}
-              <View style={styles.progressItem}>
-                <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Calories</Text>
-                  <Text style={styles.progressPercent}>
-                    {Math.round((totalCalories / 2000) * 100)}% of 2000 kcal
-                  </Text>
-                </View>
-                <View style={styles.progressBarContainer}>
-                  <View 
-                    style={[
-                      styles.progressBar, 
-                      styles.calorieProgress,
-                      { width: `${Math.min((totalCalories / 2000) * 100, 100)}%` }
-                    ]} 
-                  />
-                </View>
-              </View>
+           {/* Daily Value Progress */}
+<View style={styles.progressSection}>
+  <Text style={styles.progressTitle}>Daily Value Progress</Text>
+  
+  {/* Calories Progress */}
+  <View style={styles.progressItem}>
+    <View style={styles.progressHeader}>
+      <Text style={styles.progressLabel}>Calories</Text>
+      <Text style={styles.progressPercent}>
+        {Math.round((totalCalories / 2000) * 100)}% of 2000 kcal
+      </Text>
+    </View>
+    <View style={styles.progressBarContainer}>
+      <View 
+        style={[
+          styles.progressBar, 
+          styles.calorieProgress,
+          { width: `${Math.min((totalCalories / 2000) * 100, 100)}%` }
+        ]} 
+      />
+    </View>
+    {totalCalories >= 2000 && (
+      <Text style={styles.warningText}>
+        ⚠️ Danger! You’ve hit your calorie limit. Overeating increases risk of obesity and heart disease!
+      </Text>
+    )}
+  </View>
 
-              {/* Sugar Progress */}
-              <View style={styles.progressItem}>
-                <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Sugar</Text>
-                  <Text style={styles.progressPercent}>
-                    {Math.round((totalSugar / 50) * 100)}% of 50g limit
-                  </Text>
-                </View>
-                <View style={styles.progressBarContainer}>
-                  <View 
-                    style={[
-                      styles.progressBar, 
-                      styles.sugarProgress,
-                      { width: `${Math.min((totalSugar / 50) * 100, 100)}%` }
-                    ]} 
-                  />
-                </View>
-              </View>
+  {/* Sugar Progress */}
+  <View style={styles.progressItem}>
+    <View style={styles.progressHeader}>
+      <Text style={styles.progressLabel}>Sugar</Text>
+      <Text style={styles.progressPercent}>
+        {Math.round((totalSugar / 50) * 100)}% of 50g limit
+      </Text>
+    </View>
+    <View style={styles.progressBarContainer}>
+      <View 
+        style={[
+          styles.progressBar, 
+          styles.sugarProgress,
+          { width: `${Math.min((totalSugar / 50) * 100, 100)}%` }
+        ]} 
+      />
+    </View>
+    {totalSugar >= 50 && (
+      <Text style={styles.warningText}>
+        ⚠️ Warning! Too much sugar can lead to diabetes, liver damage, and heart problems!
+      </Text>
+    )}
+  </View>
 
-              {/* Cholesterol Progress */}
-              <View style={styles.progressItem}>
-                <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Cholesterol</Text>
-                  <Text style={styles.progressPercent}>
-                    {Math.round((totalCholesterol / 300) * 100)}% of 300mg limit
-                  </Text>
-                </View>
-                <View style={styles.progressBarContainer}>
-                  <View 
-                    style={[
-                      styles.progressBar, 
-                      styles.cholesterolProgress,
-                      { width: `${Math.min((totalCholesterol / 300) * 100, 100)}%` }
-
-                    ]} 
-                  />
-                </View>
-              </View>
-              
-            </View>
+  {/* Cholesterol Progress */}
+  <View style={styles.progressItem}>
+    <View style={styles.progressHeader}>
+      <Text style={styles.progressLabel}>Cholesterol</Text>
+      <Text style={styles.progressPercent}>
+        {Math.round((totalCholesterol / 300) * 100)}% of 300mg limit
+      </Text>
+    </View>
+    <View style={styles.progressBarContainer}>
+      <View 
+        style={[
+          styles.progressBar, 
+          styles.cholesterolProgress,
+          { width: `${Math.min((totalCholesterol / 300) * 100, 100)}%` }
+        ]} 
+      />
+    </View>
+    {totalCholesterol >= 300 && (
+      <Text style={styles.warningText}>
+        ⚠️ Alert! High cholesterol clogs arteries and raises risk of heart attack or stroke!
+      </Text>
+    )}
+  </View>
+</View>
           </View>
         </ScrollView>
       </ImageBackground>
@@ -501,6 +514,7 @@ export default function CalorieCalculator() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   backgroundImage: {
     flex: 1,
@@ -577,6 +591,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
+  warningText: {
+  color: 'red',
+  fontWeight: 'bold',
+  marginTop: 6,
+  fontSize: 14,
+  textAlign: 'center',
+},
   calculateButton: {
     backgroundColor: '#0891b2',
     borderRadius: 8,

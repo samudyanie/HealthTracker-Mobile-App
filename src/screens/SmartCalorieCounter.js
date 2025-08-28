@@ -48,6 +48,32 @@ export default function SmartCalorieCounter() {
     }
   };
 
+  const capturePhoto = async () => {
+  setError(null);
+  try {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      setError("Camera access is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      // allowsEditing: true, // optional
+      // exif: false,         // optional
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0]);
+      setAnalysisResult(null);
+    }
+  } catch (e) {
+    setError("Failed to capture image: " + e.message);
+  }
+};
+            
+
   const analyzePhoto = async () => {
     if (!selectedImage) return;
 
@@ -97,13 +123,13 @@ export default function SmartCalorieCounter() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>🍎 Smart Calorie Counter</Text>
+        <Text style={styles.title}>Pre - Bite Calorie Counter</Text>
         <Text style={styles.greeting}>Hey👋</Text>
         <Text style={styles.date}>{currentDate}</Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>What do you want to do today?</Text>
+        <Text style={styles.subtitle}>Let's take a look on your food before you eat</Text>
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => setShowPhotoUpload(true)}
@@ -114,7 +140,7 @@ export default function SmartCalorieCounter() {
               <Camera size={40} color="#ea580c" />
             </View>
             <View style={styles.actionTextContainer}>
-              <Text style={styles.actionTitle}>Scan Food Photo</Text>
+              <Text style={styles.actionTitle}>Scan Your Food</Text>
               <Text style={styles.actionDescription}>Take a photo to get instant calorie info 📸</Text>
             </View>
             <View>
@@ -132,19 +158,21 @@ export default function SmartCalorieCounter() {
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Scan Food Photo</Text>
+              <Text style={styles.modalTitle}>Scan Your Food</Text>
               <TouchableOpacity onPress={closePhotoModal}>
                 <X size={24} color="#6b7280" />
               </TouchableOpacity>
+              
             </View>
 
             {!selectedImage && (
               <View style={styles.uploadPrompt}>
                 <Camera size={48} color="#9ca3af" />
                 <Text style={styles.uploadPromptText}>Select a photo of your food</Text>
-                <TouchableOpacity style={styles.choosePhotoButton} onPress={pickImage}>
-                  <Text style={styles.choosePhotoButtonText}>Choose Photo</Text>
-                </TouchableOpacity>
+               <TouchableOpacity style={styles.choosePhotoButton} onPress={pickImage}>
+                <Text style={styles.choosePhotoButtonText}>Choose Photo</Text>
+              </TouchableOpacity>
+
                 {error && (
                   <View style={styles.errorBox}>
                     <AlertCircle size={20} color="#b91c1c" />
@@ -243,6 +271,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#ea580c",
     marginBottom: 8,
+    textAlign: "center",
   },
   greeting: {
     fontSize: 20,
