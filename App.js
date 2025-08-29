@@ -20,6 +20,8 @@ import BloodSugarHistoryScreen from './src/screens/BloodSugarScreen';
 import CalorieCounterScreen from './src/screens/CalorieCounterScreen';
 import BMICalculatorScreen from './src/screens/BMICalculatorScreen';
 import SmartCalorieCounter from './src/screens/SmartCalorieCounter';
+import ChatScreen from './src/screens/ChatScreen';
+import DoctorChatScreen from './src/screens/DoctorChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -47,6 +49,9 @@ export default function AppNavigator() {
         <Stack.Screen name="CalorieCounter" component={CalorieCounterScreen}/>
         <Stack.Screen name="BMICalculator" component={BMICalculatorScreen} />
         <Stack.Screen name="SmartCalorieCounter" component={SmartCalorieCounter}/>
+        <Stack.Screen name="Chat" component={ChatScreen}/>
+        <Stack.Screen name="DoctorChat" component={DoctorChatScreen} options={{ headerShown: false }} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

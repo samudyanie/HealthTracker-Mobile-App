@@ -5,7 +5,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Health & Meals Tracker</Text>
-      <Text style={styles.subtitle}>----------------------------------------</Text>
+      <Text style={styles.subtitle}>--------------------------------------</Text>
       <Text style={styles.loginText}>Log in as a</Text>
 
       <View style={styles.optionsContainer}>

@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from "rea
 import axios from "axios";
 
 const apiMap = {
-  "bloodpressure": "/getbloodpressurebypatient/",
-  "bloodsugar": "/getbloodsugarbypatient/",
-  "fbc": "/getfbcbypatient/",
-  "lipid": "/getlipidbypatient/",
+  bloodpressure: "/getbloodpressurebypatient/",
+  bloodsugar: "/getbloodsugarbypatient/",
+  fbc: "/getfbcbypatient/",
+  lipid: "/getlipidbypatient/",
 };
 
 const labelMap = {
@@ -15,14 +15,13 @@ const labelMap = {
     systolic: "Systolic",
     diastolic: "Diastolic",
     pulse: "Pulse",
-    doctorComment: "Doctor's Comment"
+    doctorComment: "Doctor's Comment",
   },
   bloodsugar: {
     date: "Date",
     value: "Blood Sugar",
-    type:"Type",
-    doctorComment: "Doctor's Comment"
-  
+    type: "Type",
+    doctorComment: "Doctor's Comment",
   },
   fbc: {
     date: "Date",
@@ -30,7 +29,7 @@ const labelMap = {
     rbc: "RBC",
     wbc: "WBC",
     platelet: "Platelet",
-    doctorComment: "Doctor's Comment"
+    doctorComment: "Doctor's Comment",
   },
   lipid: {
     date: "Date",
@@ -38,19 +37,19 @@ const labelMap = {
     ldl: "LDL",
     triglycerides: "Triglycerides",
     cholesterol: "Cholesterol",
-    doctorComment: "Doctor's Comment"
-  }
+    doctorComment: "Doctor's Comment",
+  },
 };
 
 const columnMap = {
   bloodpressure: ["date", "systolic", "diastolic", "pulse", "doctorComment"],
-  bloodsugar: ["date", "value", "type","doctorComment"],
+  bloodsugar: ["date", "value", "type", "doctorComment"],
   fbc: ["date", "haemoglobin", "rbc", "wbc", "platelet", "doctorComment"],
   lipid: ["date", "hdl", "ldl", "triglycerides", "cholesterol", "doctorComment"],
 };
 
 const PatientReportList = ({ patientId, reportType }) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); // always start with []
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [expandedCardId, setExpandedCardId] = useState(null);
@@ -64,87 +63,71 @@ const PatientReportList = ({ patientId, reportType }) => {
     setError(null);
 
     axios
-      .get(`http://192.168.1.20:5555/api/patient${endpoint}${patientId}`)
+      .get(`http://192.168.1.20:5555/api/patient${endpoint}${patientId}`, {
+        validateStatus: (s) => (s >= 200 && s < 300) || s === 404,
+      })
       .then((res) => {
-        setData(res.data);
-        setLoading(false);
+        if (res.status === 404) {
+          setData([]); // keep it an array
+        } else {
+          setData(res.data || []); // default to [] if null/undefined
+        }
       })
       .catch((err) => {
         console.error("Error fetching history:", err);
-        setError("No records found");
-        setLoading(false);
-      });
+        setError("Something went wrong. Please try again.");
+      })
+      .finally(() => setLoading(false));
   }, [patientId, reportType]);
 
   const toggleCardExpansion = (index) => {
-    if (expandedCardId === index) {
-      setExpandedCardId(null);
-    } else {
-      setExpandedCardId(index);
+    setExpandedCardId(expandedCardId === index ? null : index);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "No date";
+    try {
+      let date;
+      if (/^\d{4}\.\d{2}\.\d{2}$/.test(dateString)) {
+        const reformattedDate = dateString.replace(/\./g, "-");
+        date = new Date(reformattedDate);
+      } else {
+        date = new Date(dateString);
+      }
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (error) {
+      return dateString;
     }
   };
-  
-  // Format date to be more readable
-const formatDate = (dateString) => {
-  if (!dateString) return "No date";
-  
-  try {
-    let date;
-    
-    // Check if date is in YYYY.MM.DD format
-    if (/^\d{4}\.\d{2}\.\d{2}$/.test(dateString)) {
-      // Replace dots with hyphens for reliable parsing
-      const reformattedDate = dateString.replace(/\./g, '-');
-      date = new Date(reformattedDate);
-    } else {
-      // Handle other formats (YYYY-MM-DD or MM/DD/YYYY)
-      date = new Date(dateString);
-    }
-    
-    // Check if date is valid
-    if (isNaN(date.getTime())) return dateString;
-    
-    // Format as "Month DD, YYYY" (e.g., "May 17, 2025")
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  } catch (error) {
-    return dateString; // Return original if parsing fails
-  }
-};
 
-  // Render a single card item
   const renderCard = ({ item, index }) => {
     if (!reportType) return null;
-    
+
     const columns = columnMap[reportType.toLowerCase()] || [];
     const labels = labelMap[reportType.toLowerCase()] || {};
     const isExpanded = expandedCardId === index;
-    
-    // Get the date to display in the card header with better formatting
+
     const dateValue = formatDate(item.date);
-    
-    // Get main values to display in collapsed card (excluding date and doctor comment)
-    const mainColumns = columns.filter(col => col !== 'date' && col !== 'doctorComment');
-    
+    const mainColumns = columns.filter((col) => col !== "date" && col !== "doctorComment");
+
     return (
-      <TouchableOpacity 
-        style={styles.card} 
+      <TouchableOpacity
+        style={styles.card}
         onPress={() => toggleCardExpansion(index)}
         activeOpacity={0.8}
       >
-        {/* Card Header with Date */}
         <View style={styles.cardHeader}>
           <Text style={styles.cardDate}>{dateValue}</Text>
-          <Text style={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
+          <Text style={styles.expandIcon}>{isExpanded ? "▼" : "▶"}</Text>
         </View>
 
-        {/* Card Content */}
         <View style={styles.cardContent}>
           {!isExpanded ? (
-            // Collapsed view - show only key values
             <View style={styles.collapsedContent}>
               {mainColumns.slice(0, 2).map((column) => (
                 <View key={column} style={styles.valueRow}>
@@ -157,27 +140,28 @@ const formatDate = (dateString) => {
               )}
             </View>
           ) : (
-            // Expanded view - show all values
             <View style={styles.expandedContent}>
-              {columns.filter(col => col !== 'date').map((column) => (
-                <View key={column} style={styles.valueRow}>
-                  <Text style={styles.valueLabel}>{labels[column]}:</Text>
-                  <Text style={[
-                    styles.valueText, 
-                    column === 'doctorComment' && styles.doctorComment
-                  ]}>
-                    {item[column] || "-"}
-                  </Text>
-                </View>
-              ))}
+              {columns
+                .filter((col) => col !== "date")
+                .map((column) => (
+                  <View key={column} style={styles.valueRow}>
+                    <Text style={styles.valueLabel}>{labels[column]}:</Text>
+                    <Text
+                      style={[
+                        styles.valueText,
+                        column === "doctorComment" && styles.doctorComment,
+                      ]}
+                    >
+                      {item[column] || "-"}
+                    </Text>
+                  </View>
+                ))}
             </View>
           )}
         </View>
       </TouchableOpacity>
     );
   };
-
-  // No longer need the ItemSeparator component since we're not using FlatList
 
   if (loading) {
     return (
@@ -200,8 +184,8 @@ const formatDate = (dateString) => {
       <Text style={styles.title}>
         {reportType ? reportType.replace(/^(\w)/, (c) => c.toUpperCase()) : ""} Report History
       </Text>
-      
-      {data.length === 0 ? (
+
+      {!data || data.length === 0 ? (
         <Text style={styles.noDataText}>No records found</Text>
       ) : (
         <View style={styles.cardList}>

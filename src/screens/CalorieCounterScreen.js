@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     borderColor: '#d1d5db',
   },
   picker: {
-    height: 50,
+    height: 60,
   },
   input: {
     backgroundColor: '#f9fafb',

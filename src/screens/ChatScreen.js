@@ -243,7 +243,7 @@ const ChatScreen = ({ navigation, route }) => {
             <Text style={styles.backTxt}>‹ Back</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
-            Chat with {effectiveDoctorName} {effectiveDoctorId ? `( #${effectiveDoctorId} )` : ''}
+            Chat with {effectiveDoctorName}
           </Text>
           <View style={{ width: 64 }} />
         </View>

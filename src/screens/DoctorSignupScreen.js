@@ -23,7 +23,7 @@ export default function DoctorSignupScreen({ navigation }) {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post('http://172.20.10.7:5555/api/doctor/signup', {
+      const response = await axios.post('http://192.168.1.20:5555/api/doctor/signup', {
         name,
         email,
         doctornumber: doctorNumber,

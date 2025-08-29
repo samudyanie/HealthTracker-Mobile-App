@@ -2,6 +2,7 @@
   "expo": {
     "name": "health-tracker-mobile",
     "slug": "health-tracker-mobile",
+    "owner": "samudyani",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,16 +14,23 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.samudyani.healthtrackermobile"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.samudyani.healthtrackermobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0e76ec79-09fa-4299-9990-c1ae0c19c3cc"
+      }
     }
   }
 }

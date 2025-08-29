@@ -270,10 +270,6 @@ const BloodSugarScreen = () => {
           patientId={userId.id} 
           reportType={"bloodsugar"} 
         />
-          <PatientReportList 
-          patientId={userId.id} 
-          reportType={"bloodsugar"} 
-        />
       </View>
     </ScrollView>
   );

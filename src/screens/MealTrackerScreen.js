@@ -21,7 +21,7 @@ export default function MealTrackerScreen({ navigation }) {
             source={require('../assets/smart_calorie_counter.jpg')}
             style={styles.buttonImage}
           />
-          <Text style={styles.buttonText}>Smart Calorie Counter</Text>
+          <Text style={styles.buttonText}>Pre Bite Calorie Counter</Text>
         </TouchableOpacity>
 
         {/* Calorie Counter */}

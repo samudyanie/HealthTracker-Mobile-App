@@ -39,12 +39,35 @@ const ViewReports = () => {
   const route = useRoute();
   const reportType = route.params?.reportType;
 
-  // Date formatting function for React Native
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-  };
+ const formatDate = (dateString) => {
+  if (!dateString) return "No date";
+  
+  try {
+    let date;
+    
+    // Check if date is in YYYY.MM.DD format
+    if (/^\d{4}\.\d{2}\.\d{2}$/.test(dateString)) {
+      // Replace dots with hyphens for reliable parsing
+      const reformattedDate = dateString.replace(/\./g, '-');
+      date = new Date(reformattedDate);
+    } else {
+      // Handle other formats (YYYY-MM-DD or MM/DD/YYYY)
+      date = new Date(dateString);
+    }
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return dateString;
+    
+    // Format as "Month DD, YYYY" (e.g., "May 17, 2025")
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (error) {
+    return dateString; // Return original if parsing fails
+  }
+};
 
   // Column definitions for different report types (we'll use these for modal)
   const bpColumns = [

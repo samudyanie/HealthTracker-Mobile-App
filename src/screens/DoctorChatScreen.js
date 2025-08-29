@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     overflow: 'hidden',
   },
-  picker: { height: 44 },
+  picker: { height: 52 },
   helperText: { marginTop: 6, fontSize: 12, color: '#0f766e' },
 
   // Status
